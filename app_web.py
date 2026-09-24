@@ -11,15 +11,19 @@ st.title("🌊 Optimización Hidráulica y Pérdidas por Infiltración")
 st.markdown("**Proyecto:** Canal Trapezoidal no Revestido en Carhuaz, Áncash")
 
 # ---------------------------------------------------------
-# BARRA LATERAL (DATOS DE ENTRADA INTERACTIVOS)
+# BARRA LATERAL (DATOS DE ENTRADA INTERACTIVOS - 5 DECIMALES Y L/s)
 # ---------------------------------------------------------
 st.sidebar.header("⚙️ Parámetros del Canal")
 
-Q_diseno = st.sidebar.number_input("Caudal de diseño Q (m³/s)", value=1.20, step=0.10, format="%.2f")
-n_manning = st.sidebar.number_input("Rugosidad de Manning n", value=0.025, step=0.001, format="%.3f")
-S_pendiente = st.sidebar.number_input("Pendiente longitudinal S (m/m)", value=0.001, step=0.0005, format="%.4f")
-z_talud = st.sidebar.number_input("Talud lateral z (H:1V)", value=1.50, step=0.10, format="%.2f")
-C_ingham = st.sidebar.number_input("Coeficiente de Ingham C", value=1.00, step=0.10, format="%.2f")
+# Ingreso en L/s con 5 decimales
+Q_ls = st.sidebar.number_input("Caudal de diseño Q (L/s)", value=1200.00000, step=10.00000, format="%.5f")
+# Conversión automática a m³/s para el cálculo interno de Manning
+Q_diseno = Q_ls / 1000.0 
+
+n_manning = st.sidebar.number_input("Rugosidad de Manning n", value=0.02500, step=0.00100, format="%.5f")
+S_pendiente = st.sidebar.number_input("Pendiente longitudinal S (m/m)", value=0.00100, step=0.00050, format="%.5f")
+z_talud = st.sidebar.number_input("Talud lateral z (H:1V)", value=1.50000, step=0.10000, format="%.5f")
+C_ingham = st.sidebar.number_input("Coeficiente de Ingham C", value=1.00000, step=0.10000, format="%.5f")
 
 # ---------------------------------------------------------
 # CÁLCULOS HIDRÁULICOS
@@ -73,7 +77,7 @@ for b_i in b_rango:
 # ---------------------------------------------------------
 # MOSTRAR RESULTADOS EN LA WEB
 # ---------------------------------------------------------
-st.subheader("📊 Tabla Comparativa de Resultados")
+st.subheader(f"📊 Tabla Comparativa de Resultados (Q = {Q_ls:.2f} L/s = {Q_diseno:.3f} m³/s)")
 
 table_data = {
     "Parámetro / Variable": [
@@ -82,14 +86,14 @@ table_data = {
         "Altura Total H (m)", "Infiltración (L/s/km)"
     ],
     "Criterio MEH": [
-        f"{b_meh:.3f}", f"{y_meh:.3f}", f"{area_hidraulica(b_meh, y_meh):.3f}",
-        f"{perimetro_mojado(b_meh, y_meh):.3f}", f"{Q_diseno/area_hidraulica(b_meh, y_meh):.3f}",
-        f"{bl_meh:.3f}", f"{H_meh:.3f}", f"{tasa_infiltracion_ingham(b_meh, y_meh):.2f}"
+        f"{b_meh:.5f}", f"{y_meh:.5f}", f"{area_hidraulica(b_meh, y_meh):.5f}",
+        f"{perimetro_mojado(b_meh, y_meh):.5f}", f"{Q_diseno/area_hidraulica(b_meh, y_meh):.5f}",
+        f"{bl_meh:.5f}", f"{H_meh:.5f}", f"{tasa_infiltracion_ingham(b_meh, y_meh):.5f}"
     ],
     "Criterio SMI": [
-        f"{b_smi:.3f}", f"{y_smi:.3f}", f"{area_hidraulica(b_smi, y_smi):.3f}",
-        f"{perimetro_mojado(b_smi, y_smi):.3f}", f"{Q_diseno/area_hidraulica(b_smi, y_smi):.3f}",
-        f"{bl_smi:.3f}", f"{H_smi:.3f}", f"{tasa_infiltracion_ingham(b_smi, y_smi):.2f}"
+        f"{b_smi:.5f}", f"{y_smi:.5f}", f"{area_hidraulica(b_smi, y_smi):.5f}",
+        f"{perimetro_mojado(b_smi, y_smi):.5f}", f"{Q_diseno/area_hidraulica(b_smi, y_smi):.5f}",
+        f"{bl_smi:.5f}", f"{H_smi:.5f}", f"{tasa_infiltracion_ingham(b_smi, y_smi):.5f}"
     ]
 }
 
@@ -119,8 +123,8 @@ y_geom_meh = [y_meh, 0, 0, y_meh]
 x_smi = [-b_smi/2 - z_talud*y_smi, -b_smi/2, b_smi/2, b_smi/2 + z_talud*y_smi]
 y_geom_smi = [y_smi, 0, 0, y_smi]
 
-ax2.plot(x_meh, y_geom_meh, color='red', linestyle='--', linewidth=2, label=f'MEH (b={b_meh:.2f}m)')
-ax2.plot(x_smi, y_geom_smi, color='green', linestyle='-', linewidth=2, label=f'SMI (b={b_smi:.2f}m)')
+ax2.plot(x_meh, y_geom_meh, color='red', linestyle='--', linewidth=2, label=f'MEH (b={b_meh:.3f}m)')
+ax2.plot(x_smi, y_geom_smi, color='green', linestyle='-', linewidth=2, label=f'SMI (b={b_smi:.3f}m)')
 ax2.set_title('Geometría Transversal Trapezoidal', fontweight='bold')
 ax2.set_xlabel('Ancho de Sección (m)')
 ax2.set_ylabel('Tirante y (m)')
